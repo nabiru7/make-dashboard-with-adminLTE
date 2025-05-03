@@ -12,7 +12,7 @@ window.jQuery = $;
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-
+import './components/Main';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

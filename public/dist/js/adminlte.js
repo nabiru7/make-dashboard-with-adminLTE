@@ -267,6 +267,7 @@
                     event === null || event === void 0 ? void 0 : event.preventDefault();
                     const data = new PushMenu(button, Defaults);
                     data.toggle();
+                    console.log('toggled');
                 }
             });
         });
