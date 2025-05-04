@@ -36,6 +36,19 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+
+        if ($request->filled('email') == false) {
+            session()->flash('error_email', 'Email wajib diisi.');
+        }
+
+        if ($request->filled('password') == false) {
+            session()->flash('error_password', 'Password wajib diisi.');
+        }
+
+        if ($request->password !== $request->password_confirmation) {
+            session()->flash('error_password_mismatch', 'Password dan konfirmasi password tidak cocok.');
+        }
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,

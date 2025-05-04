@@ -68,7 +68,7 @@ export default function Login({ status, canResetPassword }) {
             {/*end::Required Plugin(AdminLTE)*/}
             {/*end::Head*/}
             {/*begin::Body*/}
-            <div className="login-box m-auto">
+            <div className="login-box m-auto vh-100 d-flex flex-column justify-content-center">
                 <div className="login-logo">
                     <a href="../index2.html">
                         <b>Admin</b>LTE
@@ -78,9 +78,15 @@ export default function Login({ status, canResetPassword }) {
                 <div className="card">
                     <div className="card-body login-card-body">
                         <p className="login-box-msg">Sign in to start your session</p>
-                        <form action="../index3.html" method="post">
+                        <form onSubmit={submit}>
                             <div className="input-group mb-3">
-                                <input type="email" className="form-control" placeholder="Email" />
+                                <input
+                                    type="email"
+                                    className="form-control"
+                                    placeholder="Email"
+                                    value={data.email}
+                                    onChange={e => setData('email', e.target.value)}
+                                />
                                 <div className="input-group-text">
                                     <span className="bi bi-envelope" />
                                 </div>
@@ -90,56 +96,38 @@ export default function Login({ status, canResetPassword }) {
                                     type="password"
                                     className="form-control"
                                     placeholder="Password"
+                                    value={data.password}
+                                    onChange={e => setData('password', e.target.value)}
                                 />
                                 <div className="input-group-text">
                                     <span className="bi bi-lock-fill" />
                                 </div>
                             </div>
-                            {/*begin::Row*/}
                             <div className="row">
                                 <div className="col-8">
                                     <div className="form-check">
                                         <input
                                             className="form-check-input"
                                             type="checkbox"
-                                            defaultValue=""
-                                            id="flexCheckDefault"
+                                            checked={data.remember}
+                                            onChange={e => setData('remember', e.target.checked)}
                                         />
-                                        <label className="form-check-label" htmlFor="flexCheckDefault">
-                                            {" "}
-                                            Remember Me{" "}
-                                        </label>
+                                        <label className="form-check-label">Remember Me</label>
                                     </div>
                                 </div>
-                                {/* /.col */}
                                 <div className="col-4">
                                     <div className="d-grid gap-2">
-                                        <button type="submit" className="btn btn-primary">
+                                        <button type="submit" className="btn btn-primary" disabled={processing}>
                                             Sign In
                                         </button>
                                     </div>
                                 </div>
-                                {/* /.col */}
                             </div>
-                            {/*end::Row*/}
                         </form>
-                        <div className="social-auth-links text-center mb-3 d-grid gap-2">
-                            <p>- OR -</p>
-                            <a href="#" className="btn btn-primary">
-                                <i className="bi bi-facebook me-2" /> Sign in using Facebook
-                            </a>
-                            <a href="#" className="btn btn-danger">
-                                <i className="bi bi-google me-2" /> Sign in using Google+
-                            </a>
-                        </div>
-                        {/* /.social-auth-links */}
-                        <p className="mb-1">
-                            <a href="forgot-password.html">I forgot my password</a>
-                        </p>
                         <p className="mb-0">
-                            <a href="register.html" className="text-center">
+                            <a href="register" className="text-center">
                                 {" "}
-                                Register a new membership{" "}
+                                Register{" "}
                             </a>
                         </p>
                     </div>
