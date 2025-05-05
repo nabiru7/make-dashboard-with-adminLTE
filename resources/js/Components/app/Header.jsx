@@ -1,6 +1,8 @@
+import { Link } from "@inertiajs/react";
 import React, { useEffect } from "react";
 
-function Header() {
+
+function Header({ user }) {
     useEffect(() => {
         // Reinitialize AdminLTE components
         if (window.$ && window.$.AdminLTE) {
@@ -22,7 +24,7 @@ function Header() {
                     <li className="nav-item">
                         <a className="nav-link" href="#" data-lte-toggle="fullscreen">
                             <i data-lte-icon="maximize" className="bi bi-arrows-fullscreen"></i>
-                            <i data-lte-icon="minimize" className="bi bi-fullscreen-exit" style={{display: 'none'}}></i>
+                            <i data-lte-icon="minimize" className="bi bi-fullscreen-exit" style={{ display: 'none' }}></i>
                         </a>
                     </li>
                     <li className="nav-item dropdown user-menu">
@@ -32,12 +34,13 @@ function Header() {
                                 className="user-image rounded-circle shadow"
                                 alt="User Image"
                             />
-                            <span className="d-none d-md-inline">Alexander Pierce</span>
+                            <span className="d-none d-md-inline">{user && user.name || "User"}</span>
                         </a>
                         <ul className="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                             <li className="user-footer">
-                                <a href="#" className="btn btn-default btn-flat">Profile</a>
-                                <a href="#" className="btn btn-default btn-flat float-end">Sign out</a>
+                                <Link href={route('logout')} method="post" className="mx-auto block text-sm">
+                                    Log out
+                                </Link>
                             </li>
                         </ul>
                     </li>

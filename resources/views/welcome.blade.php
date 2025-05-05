@@ -94,8 +94,8 @@
       });
     </script>
 
-    @viteReactRefresh
-    @vite('resources/js/app.jsx')
+    <!-- @viteReactRefresh
+    @vite('resources/js/app.jsx') -->
 
   </body>
   <!--end::Body-->
