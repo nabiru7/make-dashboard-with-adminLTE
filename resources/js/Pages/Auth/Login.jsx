@@ -91,6 +91,7 @@ export default function Login({ status, canResetPassword }) {
                                     <span className="bi bi-envelope" />
                                 </div>
                             </div>
+                            <InputError message={errors.email} className="mt-1 text-danger" />
                             <div className="input-group mb-3">
                                 <input
                                     type="password"
@@ -103,6 +104,7 @@ export default function Login({ status, canResetPassword }) {
                                     <span className="bi bi-lock-fill" />
                                 </div>
                             </div>
+                            <InputError message={errors.password} className="mt-1 text-danger" />
                             <div className="row">
                                 <div className="col-8">
                                     <div className="form-check">
