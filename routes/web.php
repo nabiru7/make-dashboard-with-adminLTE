@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DonasiController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,12 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/donasi-dashboard', function () {
     return response()->json(Donasi::all());
-});
+})->name('donasi.index');
+
+Route::post('/donasi-dashboard', [DonasiController::class, 'store']);
+
+Route::put('/donasi-dashboard/{id}', [DonasiController::class, 'update']);
+
+Route::delete('/donasi-dashboard/{id}', [DonasiController::class, 'destroy']);
 
 require __DIR__.'/auth.php';

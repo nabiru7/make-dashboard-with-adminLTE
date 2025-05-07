@@ -1,3 +1,5 @@
+import { router, usePage } from "@inertiajs/react";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 
 function Content() {
@@ -6,6 +8,20 @@ function Content() {
     const [sortAsc, setSortAsc] = useState(true); //ini untuk ascending dan descending
     const [currentPage, setCurrentPage] = useState(1); //ini untuk pagination
     const itemsPerPage = 10; //jumlah data per page
+    const [editingId, setEditingId] = useState(null); //ini untuk edit data
+
+    //ini untuk bagian Create
+    const [showForm, setShowForm] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        amount: '',
+        donation_date: '',
+        donation_method: 'qris',
+        status: 'pending',
+        message: ''
+    });
+
 
     useEffect(() => {
         fetch('/donasi-dashboard')
@@ -46,6 +62,90 @@ function Content() {
         if (indexOfLastItem < sortedDonasis.length) setCurrentPage(currentPage + 1);
     };
 
+    //untuk input pada data Create
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const props = usePage().props;
+
+    //untuk edit data
+    const handleEdit = (id) => {
+        const donasiToEdit = donasis.find((donasi) => donasi.id === id);
+        if (donasiToEdit) {
+            setFormData({
+                name: donasiToEdit.name,
+                email: donasiToEdit.email,
+                amount: donasiToEdit.amount,
+                donation_date: donasiToEdit.donation_date,
+                donation_method: donasiToEdit.donation_method,
+                status: donasiToEdit.status,
+                message: donasiToEdit.message || '',
+            });
+            setEditingId(id);
+            setShowForm(true);
+        }
+    };
+
+    //ini untuk delete data
+    const handleDelete = (id) => {
+        const confirmDelete = window.confirm("Hapus data ini?");
+        if (confirmDelete) {
+            axios.delete(`/donasi-dashboard/${id}`)
+                .then(() => {
+                    fetchDonasis(); // Refetch data setelah delete
+                })
+                .catch((error) => console.error(error));
+        }
+    };
+
+    //ini untuk menyambungkan ke backend Create
+    function handleSubmit(e) {
+        e.preventDefault();
+
+        if (editingId) { 
+            router.put(`/donasi-dashboard/${editingId}`, {
+                ...formData,
+                _token: props.csrfToken,
+            }, {
+                onSuccess: () => {
+                    fetchDonasis(); 
+                    setShowForm(false);
+                    setFormData({
+                        name: '',
+                        email: '',
+                        amount: '',
+                        donation_date: '',
+                        donation_method: 'qris',
+                        status: 'pending',
+                        message: ''
+                    });
+                    setEditingId(null); 
+                }
+            });
+        } else { 
+            router.post('/donasi-dashboard', {
+                ...formData,
+                _token: props.csrfToken,
+            }, {
+                onSuccess: () => {
+                    fetchDonasis(); //
+                    setShowForm(false);
+                    setFormData({
+                        name: '',
+                        email: '',
+                        amount: '',
+                        donation_date: '',
+                        donation_method: 'qris',
+                        status: 'pending',
+                        message: ''
+                    });
+                }
+            });
+        }
+
+    }
+
     return (
         <main className="app-main">
             <div className="app-content-header">
@@ -57,6 +157,51 @@ function Content() {
             </div>
             <div className="app-content">
                 <div className="container-fluid">
+                    {/* Button Tambah Donasi */}
+                    <button className="btn btn-success mb-3" onClick={() => setShowForm(true)}>
+                        + Tambah Data
+                    </button>
+
+                    {/* Form Tambah Donasi */}
+                    {showForm && (
+                        <form onSubmit={handleSubmit} className="mb-4">
+                            <div className="row g-2">
+                                <div className="col-md-4">
+                                    <input className="form-control" type="text" placeholder="Nama" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+                                </div>
+                                <div className="col-md-4">
+                                    <input className="form-control" type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
+                                </div>
+                                <div className="col-md-4">
+                                    <input className="form-control" type="number" placeholder="Jumlah" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} required />
+                                </div>
+                                <div className="col-md-4">
+                                    <input className="form-control" type="date" value={formData.donation_date} onChange={(e) => setFormData({ ...formData, donation_date: e.target.value })} required />
+                                </div>
+                                <div className="col-md-4">
+                                    <select className="form-control" value={formData.donation_method} onChange={(e) => setFormData({ ...formData, donation_method: e.target.value })}>
+                                        <option value="qris">QRIS</option>
+                                        <option value="tunai">Tunai</option>
+                                        <option value="mbanking">mBanking</option>
+                                    </select>
+                                </div>
+                                <div className="col-md-4">
+                                    <select className="form-control" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
+                                        <option value="pending">Pending</option>
+                                        <option value="confirmed">Confirmed</option>
+                                        <option value="rejected">Rejected</option>
+                                    </select>
+                                </div>
+                                <div className="col-md-12">
+                                    <textarea className="form-control" placeholder="Pesan" value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })}></textarea>
+                                </div>
+                                <div className="col-md-12 text-end mt-2">
+                                    <button className="btn btn-primary" type="submit">Simpan</button>
+                                    <button className="btn btn-secondary ms-2" onClick={() => setShowForm(false)}>Batal</button>
+                                </div>
+                            </div>
+                        </form>
+                    )}
                     {/* Search Bar */}
                     <input
                         type="text"
@@ -89,6 +234,10 @@ function Content() {
                                         <td>{donasi.amount}</td>
                                         <td>{donasi.donation_date}</td>
                                         <td>{donasi.status}</td>
+                                        <td>
+                                            <button className="btn btn-warning btn-sm me-2" onClick={() => handleEdit(donasi.id)}>Edit</button>
+                                            <button className="btn btn-danger btn-sm" onClick={() => handleDelete(donasi.id)}>Delete</button>
+                                        </td>
                                     </tr>
                                 ))
                             ) : (

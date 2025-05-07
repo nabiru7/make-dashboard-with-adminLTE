@@ -10,4 +10,14 @@ class Donasi extends Model
     use HasFactory;
 
     protected $table = 'donasi_dashboard'; 
+
+    protected $fillable = [
+        'name',
+        'email',
+        'amount',
+        'donation_date',
+        'donation_method',
+        'status',
+        'message',
+    ];
 }
