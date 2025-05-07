@@ -1,9 +1,9 @@
-import { router, usePage } from "@inertiajs/react";
+import { router, useForm, usePage } from "@inertiajs/react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
-function Content() {
-    const [donasis, setDonasis] = useState([]);
+function Content({ data_donasis }) {
+    const [donasis, setDonasis] = useState(data_donasis);
     const [searchTerm, setSearchTerm] = useState(""); //ini untuk fitur search
     const [sortAsc, setSortAsc] = useState(true); //ini untuk ascending dan descending
     const [currentPage, setCurrentPage] = useState(1); //ini untuk pagination
@@ -12,7 +12,7 @@ function Content() {
 
     //ini untuk bagian Create
     const [showForm, setShowForm] = useState(false);
-    const [formData, setFormData] = useState({
+    const { data, setData, post, put, delete: destroy, reset, errors } = useForm({
         name: '',
         email: '',
         amount: '',
@@ -23,12 +23,12 @@ function Content() {
     });
 
 
-    useEffect(() => {
-        fetch('/donasi-dashboard')
-            .then((response) => response.json())
-            .then((data) => setDonasis(data))
-            .catch((error) => console.error(error));
-    }, []);
+    // useEffect(() => {
+    //     fetch('/donasi-dashboard')
+    //         .then((response) => response.json())
+    //         .then((data) => setDonasis(data))
+    //         .catch((error) => console.error(error));
+    // }, []);
 
     //ini filter untuk fitur search
     const filteredDonasis = donasis.filter(donasi =>
@@ -64,7 +64,7 @@ function Content() {
 
     //untuk input pada data Create
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setData(e.target.name, e.target.value);
     };
 
     const props = usePage().props;
@@ -73,7 +73,7 @@ function Content() {
     const handleEdit = (id) => {
         const donasiToEdit = donasis.find((donasi) => donasi.id === id);
         if (donasiToEdit) {
-            setFormData({
+            setData({
                 name: donasiToEdit.name,
                 email: donasiToEdit.email,
                 amount: donasiToEdit.amount,
@@ -91,11 +91,8 @@ function Content() {
     const handleDelete = (id) => {
         const confirmDelete = window.confirm("Hapus data ini?");
         if (confirmDelete) {
-            axios.delete(`/donasi-dashboard/${id}`)
-                .then(() => {
-                    fetchDonasis(); // Refetch data setelah delete
-                })
-                .catch((error) => console.error(error));
+            destroy(`/donasi-dashboard/${id}`);
+            window.location.reload(); // Reload the page to fetch updated data
         }
     };
 
@@ -103,43 +100,22 @@ function Content() {
     function handleSubmit(e) {
         e.preventDefault();
 
-        if (editingId) { 
-            router.put(`/donasi-dashboard/${editingId}`, {
-                ...formData,
-                _token: props.csrfToken,
-            }, {
+        if (editingId) {
+            put(`/donasi-dashboard/${editingId}`, {
                 onSuccess: () => {
-                    fetchDonasis(); 
+                    // fetchDonasis(); 
                     setShowForm(false);
-                    setFormData({
-                        name: '',
-                        email: '',
-                        amount: '',
-                        donation_date: '',
-                        donation_method: 'qris',
-                        status: 'pending',
-                        message: ''
-                    });
-                    setEditingId(null); 
+                    reset()
+                    setEditingId(null);
+                    window.location.reload(); // Reload the page to fetch updated data
                 }
-            });
-        } else { 
-            router.post('/donasi-dashboard', {
-                ...formData,
-                _token: props.csrfToken,
-            }, {
+            })
+        } else {
+            post('/donasi-dashboard', {
                 onSuccess: () => {
-                    fetchDonasis(); //
                     setShowForm(false);
-                    setFormData({
-                        name: '',
-                        email: '',
-                        amount: '',
-                        donation_date: '',
-                        donation_method: 'qris',
-                        status: 'pending',
-                        message: ''
-                    });
+                    reset();
+                    window.location.reload(); // Reload the page to fetch updated data
                 }
             });
         }
@@ -167,33 +143,33 @@ function Content() {
                         <form onSubmit={handleSubmit} className="mb-4">
                             <div className="row g-2">
                                 <div className="col-md-4">
-                                    <input className="form-control" type="text" placeholder="Nama" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+                                    <input className="form-control" type="text" placeholder="Nama" value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} required />
                                 </div>
                                 <div className="col-md-4">
-                                    <input className="form-control" type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
+                                    <input className="form-control" type="email" placeholder="Email" value={data.email} onChange={(e) => setData({ ...data, email: e.target.value })} required />
                                 </div>
                                 <div className="col-md-4">
-                                    <input className="form-control" type="number" placeholder="Jumlah" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} required />
+                                    <input className="form-control" type="number" placeholder="Jumlah" value={data.amount} onChange={(e) => setData({ ...data, amount: e.target.value })} required />
                                 </div>
                                 <div className="col-md-4">
-                                    <input className="form-control" type="date" value={formData.donation_date} onChange={(e) => setFormData({ ...formData, donation_date: e.target.value })} required />
+                                    <input className="form-control" type="date" value={data.donation_date} onChange={(e) => setData({ ...data, donation_date: e.target.value })} required />
                                 </div>
                                 <div className="col-md-4">
-                                    <select className="form-control" value={formData.donation_method} onChange={(e) => setFormData({ ...formData, donation_method: e.target.value })}>
+                                    <select className="form-control" value={data.donation_method} onChange={(e) => setData({ ...data, donation_method: e.target.value })}>
                                         <option value="qris">QRIS</option>
                                         <option value="tunai">Tunai</option>
                                         <option value="mbanking">mBanking</option>
                                     </select>
                                 </div>
                                 <div className="col-md-4">
-                                    <select className="form-control" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
+                                    <select className="form-control" value={data.status} onChange={(e) => setData({ ...data, status: e.target.value })}>
                                         <option value="pending">Pending</option>
                                         <option value="confirmed">Confirmed</option>
                                         <option value="rejected">Rejected</option>
                                     </select>
                                 </div>
                                 <div className="col-md-12">
-                                    <textarea className="form-control" placeholder="Pesan" value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })}></textarea>
+                                    <textarea className="form-control" placeholder="Pesan" value={data.message} onChange={(e) => setData({ ...data, message: e.target.value })}></textarea>
                                 </div>
                                 <div className="col-md-12 text-end mt-2">
                                     <button className="btn btn-primary" type="submit">Simpan</button>

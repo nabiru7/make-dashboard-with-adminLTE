@@ -10,7 +10,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
-export default function AuthenticatedLayout({ header, children }) {
+export default function AuthenticatedLayout({ data_donasis, header, children }) {
     const user = usePage().props.auth.user;
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
@@ -22,7 +22,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 <div className="app-wrapper">
                     <Header user={user}></Header>
                     <Sidebar></Sidebar>
-                    <Content>{children}</Content>
+                    <Content data_donasis={data_donasis}>{children}</Content>
                     <Footer></Footer>
                 </div>
             </div>

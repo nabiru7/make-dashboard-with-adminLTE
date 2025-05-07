@@ -30,7 +30,7 @@ class DonasiController extends Controller
             'message' => $request->message,
         ]);
 
-        return Inertia::render('Dashboard');
+        return redirect('/dashboard');
     }
 
 
@@ -49,7 +49,7 @@ class DonasiController extends Controller
         $donasi = Donasi::findOrFail($id);
         $donasi->update($validated);
 
-        return response()->json(['message' => 'Data berhasil diperbarui!']);
+        return redirect('/dashboard');
     }
 
 
@@ -58,6 +58,6 @@ class DonasiController extends Controller
         $donasi = Donasi::findOrFail($id);
         $donasi->delete();
 
-        return response()->json(['message' => 'Data berhasil dihapus!']);
+        return redirect('/dashboard');
     }
 }
